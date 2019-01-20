@@ -1,0 +1,12 @@
+{
+  "name": "google-spreadsheet-json-server",
+  "version": "1.0.0",
+  "description": "Serve Google Spreadsheet data as JSON using Google API Private Key to authenticate.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jakub kub1x Podlaha <j.podlaha@gmail.com>",
+  "license": "MIT"
+}
