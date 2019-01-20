@@ -4,9 +4,16 @@
   "description": "Serve Google Spreadsheet data as JSON using Google API Private Key to authenticate.",
   "main": "app.js",
   "scripts": {
-    "start": "node .",
+    "start": "PORT=8080 node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jakub kub1x Podlaha <j.podlaha@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "google-spreadsheet": "^2.0.7",
+    "lodash": "^4.17.11"
+  }
 }
