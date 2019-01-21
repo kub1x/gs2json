@@ -4,7 +4,7 @@
   "description": "Serve Google Spreadsheet data as JSON using Google API Private Key to authenticate.",
   "main": "app.js",
   "scripts": {
-    "start": "PORT=8080 node .",
+    "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jakub kub1x Podlaha <j.podlaha@gmail.com>",
