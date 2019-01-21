@@ -11,11 +11,11 @@ app.use(cors());
 app.get('/:spreadsheetId/:sheetNumber', async function (req, res) {
   const { spreadsheetId } = req.params;
   let { sheetNumber } = req.params;
-  const { fields } = req.query;
+  const { fields, refetch } = req.query;
 
   //console.log('got request', { spreadsheetId, sheetNumber, fields } );
 
-  const { data, error } = await gsJsonFetcher(spreadsheetId, sheetNumber, { fields });
+  const { data, error } = await gsJsonFetcher(spreadsheetId, sheetNumber, { fields, refetch });
   res.json({ data, error });
 });
 
@@ -40,4 +40,4 @@ app.use(function (err, req, res, next) {
 
 
 const port = process.env.PORT;
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => console.log(`gs2json app listening on port ${port}!`));

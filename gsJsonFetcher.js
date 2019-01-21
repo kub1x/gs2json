@@ -21,20 +21,20 @@ async function gsJsonFetcher(spreadsheetId, sheetNumber = 1, options) {
 
   try {
 
-    const { fields } = options;
+    const { fields, refetch } = options;
 
     const fileName = `data/${spreadsheetId}-${sheetNumber}.json`;
 
     let rows;
 
-    if (fs.existsSync(fileName)) {
+    if (!refetch && fs.existsSync(fileName)) {
       //console.log('-- found file');
       rows = JSON.parse(fs.readFileSync(fileName, 'utf8'));
     } else {
       //console.log('-- fetching', { spreadsheetId, sheetNumber });
       rows = await fetchRows(spreadsheetId, sheetNumber);
       //console.log('-- writing file');
-      fs.writeFileSync(fileName, JSON.stringify(rows, null, 2), 'utf8');
+      await fs.writeFileSync(fileName, JSON.stringify(rows, null, 2), 'utf8');
     }
 
     //console.log('got data', rows);
