@@ -1,5 +1,5 @@
 {
-  "name": "google-spreadsheet-json-server",
+  "name": "gs2json",
   "version": "1.0.0",
   "description": "Serve Google Spreadsheet data as JSON using Google API Private Key to authenticate.",
   "main": "app.js",
