@@ -10,10 +10,10 @@ const allowedTokens = require('../keys/allowed-tokens.json');
 // Enable all cors for now
 app.use(cors());
 
-app.get('/:spreadsheetId/:sheetNumber', async function (req, res) {
+app.get('/:spreadsheetId/:sheetNumber?', async function (req, res) {
   console.log('== Got request', req.originalUrl);
 
-  const { spreadsheetId, sheetNumber } = req.params;
+  const { spreadsheetId, sheetNumber = 1 } = req.params;
   let { fields, token, refetch } = req.query;
   refetch = !!+refetch; // "0"/"1" -> false/true
 
