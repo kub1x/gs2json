@@ -14,7 +14,10 @@ app.get('/:spreadsheetId/:sheetNumber', async function (req, res) {
   console.log('== Got request', req.originalUrl);
 
   const { spreadsheetId, sheetNumber } = req.params;
-  const { fields, token, refetch } = req.query;
+  let { fields, token, refetch } = req.query;
+  refetch = !!+refetch; // "0"/"1" -> false/true
+
+  console.log('== with params: ', JSON.stringify({ spreadsheetId, sheetNumber, fields, token, refetch }, null, 2));
 
   if (allowedTokens.indexOf(token) === -1) {
     return res.json({ error: 'Error: Invalid access token.' });
