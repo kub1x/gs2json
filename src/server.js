@@ -5,12 +5,14 @@ const cors = require('cors');
 
 const app = express();
 
-const allowedTokens = require('./keys/allowed-tokens.json');
+const allowedTokens = require('../keys/allowed-tokens.json');
 
 // Enable all cors for now
 app.use(cors());
 
 app.get('/:spreadsheetId/:sheetNumber', async function (req, res) {
+  console.log('== Got request', req.originalUrl);
+
   const { spreadsheetId, sheetNumber } = req.params;
   const { fields, token, refetch } = req.query;
 
@@ -43,6 +45,6 @@ app.use(function (err, req, res, next) { // eslint-disable-line no-unused-vars
 });
 
 
-const port = process.env.PORT;
-app.listen(port, () => console.log(`gs2json app listening on port ${port}!`)); // eslint-disable-line no-console
+const PORT = process.env.PORT;
+app.listen(PORT, () => console.log(`gs2json app listening on port ${PORT}!`)); // eslint-disable-line no-console
 

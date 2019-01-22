@@ -2,9 +2,10 @@
   "name": "gs2json",
   "version": "1.0.0",
   "description": "Serve Google Spreadsheet data as JSON using Google API Private Key to authenticate.",
-  "main": "app.js",
+  "main": "src/server.js",
   "scripts": {
     "start": "node .",
+    "lint": "eslint --fix src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jakub kub1x Podlaha <j.podlaha@gmail.com>",
@@ -15,5 +16,8 @@
     "express": "^4.16.4",
     "google-spreadsheet": "^2.0.7",
     "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.1"
   }
 }

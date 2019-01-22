@@ -3,14 +3,15 @@ const Promise = require('bluebird');
 const _ = require('lodash');
 const fs = require('fs');
 
+const GOOGLE_SERVICE_API_KEY = require('../keys/google_service_api_key.json');
+const DATA_DIR = '../data';
 
 async function fetchRows(spreadsheetId, sheetNumber) {
   // Setup document
   const doc = Promise.promisifyAll(new GoogleSpreadsheet(spreadsheetId));
 
   // Setup Auth
-  const creds = require('./keys/google_service_api_key.json');
-  await doc.useServiceAccountAuthAsync(creds);
+  await doc.useServiceAccountAuthAsync(GOOGLE_SERVICE_API_KEY);
 
   // Fetch data from #sheetNumber spreadsheet
   return await doc.getRowsAsync(sheetNumber);
@@ -23,29 +24,30 @@ async function gsJsonFetcher(spreadsheetId, sheetNumber = 1, options) {
 
     const { fields, refetch } = options;
 
-    const fileName = `data/${spreadsheetId}-${sheetNumber}.json`;
+    const fileName = `${__dirname}/${DATA_DIR}/${spreadsheetId}-${sheetNumber}.json`;
 
     let rows;
 
     if (!refetch && fs.existsSync(fileName)) {
-      //console.log('-- found file');
+      console.log('-- found file: ', fileName);
       rows = JSON.parse(fs.readFileSync(fileName, 'utf8'));
     } else {
-      //console.log('-- fetching', { spreadsheetId, sheetNumber });
+      console.log('-- fetching: ', { spreadsheetId, sheetNumber });
       rows = await fetchRows(spreadsheetId, sheetNumber);
-      //console.log('-- writing file');
+      console.log('-- writing file: ', fileName);
       await fs.writeFileSync(fileName, JSON.stringify(rows, null, 2), 'utf8');
     }
 
-    //console.log('got data', rows);
+    console.log('-- got datas: ', rows.length);
 
     rows = rows.map(row => _.pick(row, fields.split(',')));
 
-    //console.log('returning', rows);
+    console.log('-- returning fields: ', fields);
 
     return { data: rows };
 
   } catch (e) {
+    console.error('Error from fetcher', e);
     return { error: e };
   }
 
