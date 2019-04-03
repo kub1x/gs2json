@@ -38,12 +38,12 @@ app.get('/:spreadsheetId/:sheetNumber', async function (req, res) {
   console.log('== Got request', req.originalUrl);
 
   const { spreadsheetId, sheetNumber } = req.params;
-  let { fields, refetch } = req.query;
+  let { refetch } = req.query;
   refetch = !!+refetch; // "0"/"1" -> false/true
 
-  console.log('== with params: ', JSON.stringify({ spreadsheetId, sheetNumber, fields, refetch }, null, 2));
+  console.log('== with params: ', JSON.stringify({ spreadsheetId, sheetNumber, refetch }, null, 2));
 
-  const { data, error } = await fetchAsJson(spreadsheetId, sheetNumber, { fields, refetch });
+  const { data, error } = await fetchAsJson(spreadsheetId, sheetNumber, { refetch });
 
   return res.json({ data, error });
 });

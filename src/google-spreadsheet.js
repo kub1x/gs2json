@@ -38,7 +38,7 @@ async function fetchAsJson(spreadsheetId, sheetNumber = 1, options) {
 
   try {
 
-    const { fields, refetch } = options;
+    const { refetch } = options;
 
     const fileName = `${__dirname}/${DATA_DIR}/${spreadsheetId}-${sheetNumber}.json`;
 
@@ -58,11 +58,6 @@ async function fetchAsJson(spreadsheetId, sheetNumber = 1, options) {
 
     const OMITTED_ROW_FIELDS = ['_xml', 'id', 'app:edited', '_links'];
     rows = rows.map(row => _.omit(row, OMITTED_ROW_FIELDS));
-
-    if (fields) {
-      rows = rows.map(row => _.pick(row, fields.split(',')));
-      console.log('-- returning fields: ', fields);
-    }
 
     return { data: rows };
 
