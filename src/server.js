@@ -1,4 +1,4 @@
-const gsJsonFetcher = require('./gsJsonFetcher');
+const { fetchAsJson, listSheets } = require('./google-spreadsheet');
 
 const express = require('express');
 const cors = require('cors');
@@ -10,23 +10,44 @@ const allowedTokens = require('../keys/allowed-tokens.json');
 // Enable all cors for now
 app.use(cors());
 
-app.get('/:spreadsheetId/:sheetNumber?', async function (req, res) {
+// Check auth token
+app.use(function (req, res, next) {
+  let { token } = req.query;
+  if (allowedTokens.indexOf(token) === -1) {
+    res.json({ error: 'Error: Invalid access token.' });
+  } else {
+    next();
+  }
+});
+
+
+app.get('/:spreadsheetId', async function (req, res) {
   console.log('== Got request', req.originalUrl);
 
-  const { spreadsheetId, sheetNumber = 1 } = req.params;
-  let { fields, token, refetch } = req.query;
-  refetch = !!+refetch; // "0"/"1" -> false/true
+  const { spreadsheetId } = req.params;
 
-  console.log('== with params: ', JSON.stringify({ spreadsheetId, sheetNumber, fields, token, refetch }, null, 2));
+  console.log('== with params: ', JSON.stringify({ spreadsheetId }, null, 2));
 
-  if (allowedTokens.indexOf(token) === -1) {
-    return res.json({ error: 'Error: Invalid access token.' });
-  }
-
-  const { data, error } = await gsJsonFetcher(spreadsheetId, sheetNumber, { fields, refetch });
+  const { data, error } = await listSheets(spreadsheetId);
 
   return res.json({ data, error });
 });
+
+
+app.get('/:spreadsheetId/:sheetNumber', async function (req, res) {
+  console.log('== Got request', req.originalUrl);
+
+  const { spreadsheetId, sheetNumber } = req.params;
+  let { fields, refetch } = req.query;
+  refetch = !!+refetch; // "0"/"1" -> false/true
+
+  console.log('== with params: ', JSON.stringify({ spreadsheetId, sheetNumber, fields, refetch }, null, 2));
+
+  const { data, error } = await fetchAsJson(spreadsheetId, sheetNumber, { fields, refetch });
+
+  return res.json({ data, error });
+});
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -49,5 +70,9 @@ app.use(function (err, req, res, next) { // eslint-disable-line no-unused-vars
 
 
 const PORT = process.env.PORT;
-app.listen(PORT, () => console.log(`gs2json app listening on port ${PORT}!`)); // eslint-disable-line no-console
+app.listen(PORT, function () {
+  console.error('========================================================================');
+  console.log('========================================================================');
+  console.log(`gs2json app listening on port ${PORT}!`)
+}); // eslint-disable-line no-console
 
