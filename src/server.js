@@ -1,3 +1,4 @@
+/* eslint no-console: "off" */
 const { fetchAsJson, listSheets } = require('./google-spreadsheet');
 
 const express = require('express');
@@ -25,10 +26,12 @@ app.get('/:spreadsheetId', async function (req, res) {
   console.log('== Got request', req.originalUrl);
 
   const { spreadsheetId } = req.params;
+  let { refetch } = req.query;
+  refetch = !!+refetch; // "0"/"1" -> false/true
 
-  console.log('== with params: ', JSON.stringify({ spreadsheetId }, null, 2));
+  console.log('== with params: ', JSON.stringify({ spreadsheetId, refetch }, null, 2));
 
-  const { data, error } = await listSheets(spreadsheetId);
+  const { data, error } = await listSheets({ spreadsheetId, refetch });
 
   return res.json({ data, error });
 });
@@ -43,7 +46,7 @@ app.get('/:spreadsheetId/:sheetNumber', async function (req, res) {
 
   console.log('== with params: ', JSON.stringify({ spreadsheetId, sheetNumber, refetch }, null, 2));
 
-  const { data, error } = await fetchAsJson(spreadsheetId, sheetNumber, { refetch });
+  const { data, error } = await fetchAsJson({ spreadsheetId, sheetNumber, refetch });
 
   return res.json({ data, error });
 });
@@ -73,6 +76,6 @@ const PORT = process.env.PORT;
 app.listen(PORT, function () {
   console.error('========================================================================');
   console.log('========================================================================');
-  console.log(`gs2json app listening on port ${PORT}!`)
+  console.log(`gs2json app listening on port ${PORT}!`);
 }); // eslint-disable-line no-console
 
