@@ -1,6 +1,5 @@
 /* eslint no-console: "off" */
-const GoogleSpreadsheet = require('google-spreadsheet');
-const Promise = require('bluebird');
+const { GoogleSpreadsheet } = require('google-spreadsheet');
 const _ = require('lodash');
 const fs = require('fs');
 
@@ -10,10 +9,13 @@ const DATA_DIR = '../data';
 
 async function getDoc(spreadsheetId) {
   // Setup document
-  const doc = Promise.promisifyAll(new GoogleSpreadsheet(spreadsheetId));
+  const doc = new GoogleSpreadsheet(spreadsheetId);
 
   // Setup Auth
-  await doc.useServiceAccountAuthAsync(GOOGLE_SERVICE_API_KEY);
+  await doc.useServiceAccountAuth(GOOGLE_SERVICE_API_KEY);
+
+  // Get sheets list
+  await doc.loadInfo();
 
   return doc;
 }
@@ -21,13 +23,15 @@ async function getDoc(spreadsheetId) {
 
 async function fetchRows(spreadsheetId, sheetNumber) {
   const doc = await getDoc(spreadsheetId);
-  return await doc.getRowsAsync(sheetNumber);
+  const sheet = doc.sheetsByIndex[sheetNumber] || doc.sheetsById[sheetNumber];
+  const rows = (await sheet.getRows()).map((row) => _.omitBy(row, (value, key) => key.startsWith('_')));
+  return rows;
 }
 
 async function fetchSheetList(spreadsheetId) {
   const doc = await getDoc(spreadsheetId);
-  let info = await doc.getInfoAsync();
-  return info.worksheets;
+  const res = doc.sheetsByIndex.map(sheet => ({ index: sheet.index, id: sheet.sheetId, title: sheet.title }));
+  return res;
 }
 
 
@@ -46,12 +50,9 @@ function cacheRetore(fileName) {
 async function justGetIt({ fileName, refetch, fetchFn }) {
   let data;
   if (!refetch && cacheExists(fileName)) {
-    console.log('-- found file: ', fileName);
     data = cacheRetore(fileName);
   } else {
-    console.log('-- fetching');
     data = await fetchFn();
-    console.log('-- writing file: ', fileName);
     cacheStore(fileName, data);
   }
   return data;
@@ -65,11 +66,7 @@ async function fetchAsJson({ spreadsheetId, sheetNumber = 1, refetch }) {
     const fileName = `${__dirname}/${DATA_DIR}/${spreadsheetId}-${sheetNumber}.json`;
     const fetchFn = () => fetchRows(spreadsheetId, sheetNumber);
 
-    let rows = await justGetIt({ fileName, refetch, fetchFn });
-
-    const OMITTED_ROW_FIELDS = ['_xml', 'id', 'app:edited', '_links'];
-    rows = rows.map(row => _.omit(row, OMITTED_ROW_FIELDS));
-    console.log('-- got rows: ', rows.length);
+    const rows = await justGetIt({ fileName, refetch, fetchFn });
 
     return { data: rows };
 
@@ -92,8 +89,7 @@ async function listSheets({ spreadsheetId, refetch }) {
 
     let sheets = await justGetIt({ fileName, refetch, fetchFn });
 
-    sheets = sheets.map(sheet => _.pick(sheet, ['id', 'title']));
-    console.log('-- got sheets: ', sheets.length);
+    sheets = sheets.map(sheet => _.pick(sheet, ['index', 'id', 'title']));
 
     return { data: sheets };
 
