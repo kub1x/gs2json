@@ -8,7 +8,7 @@ module.exports = {
       name      : 'gs2json',
       script    : 'src/server.js',
       env: {
-        PORT: '8080',
+        PORT: '8099',
       },
     },
   ],
