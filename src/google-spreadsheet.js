@@ -23,7 +23,10 @@ async function getDoc(spreadsheetId) {
 
 async function fetchRows(spreadsheetId, sheetNumber) {
   const doc = await getDoc(spreadsheetId);
-  const sheet = doc.sheetsByIndex[sheetNumber] || doc.sheetsById[sheetNumber];
+  const sheet = doc.sheetsByIndex[sheetNumber] || doc.sheetsById[sheetNumber] || doc.sheetsByIndex[0]; // Defaults to first one for now
+  if (!sheet) {
+    throw `No sheet to return for given spreadsheetId: ${spreadsheetId} and sheetNumber: ${sheetNumber}`;
+  }
   const rows = (await sheet.getRows()).map((row) => _.omitBy(row, (value, key) => key.startsWith('_')));
   return rows;
 }
@@ -60,7 +63,7 @@ async function justGetIt({ fileName, refetch, fetchFn }) {
 
 
 
-async function fetchAsJson({ spreadsheetId, sheetNumber = 1, refetch }) {
+async function fetchAsJson({ spreadsheetId, sheetNumber = 0, refetch }) {
   try {
 
     const fileName = `${__dirname}/${DATA_DIR}/${spreadsheetId}-${sheetNumber}.json`;
